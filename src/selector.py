@@ -19,7 +19,6 @@ class FunctionNameSelector:
     ) -> None:
         self._model = model
         self._vocab = vocab
-        self.last_token_count = 0
 
     def select(
         self, prompt_ids: list[int], candidates: list[FunctionDefinition]
@@ -49,7 +48,6 @@ class FunctionNameSelector:
                 if step < len(seq) and seq[step] == chosen_id
             ]
 
-        self.last_token_count = len(generated)
         return (remaining[0][0] if remaining else ""), generated
 
     def _choose(self, input_ids: list[int], allowed_ids: list[int]) -> int:

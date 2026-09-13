@@ -23,14 +23,6 @@ class FunctionCaller:
         self._selector = FunctionNameSelector(model, vocab)
         self._builder = ParametersBuilder(model, vocab)
 
-    @property
-    def last_name_tokens(self) -> int:
-        return self._selector.last_token_count
-
-    @property
-    def last_value_tokens(self) -> int:
-        return self._builder.last_token_count
-
     def process(self, test_prompt: TestPrompt) -> FunctionCallResult | None:
         """Return the call for this request, or None if impossible."""
         if not self._functions:
@@ -46,9 +38,6 @@ class FunctionCaller:
         if function is None:
             return None
 
-        # The name tokens stay in the context: the values are written
-        # right after the name the model has just committed to, which
-        # is what makes them consistent with the chosen function.
         parameters = self._builder.build(
             prompt_ids + name_ids, function, test_prompt.prompt
         )

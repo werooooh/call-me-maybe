@@ -26,9 +26,7 @@ class TextualGenerator(ValueGenerator):
     MAX_FREE_TOKENS = 16
     LOOP_WINDOW = 3
 
-    def __init__(
-        self, model: Small_LLM_Model, vocab: TokenVocabulary
-    ) -> None:
+    def __init__(self, model: Small_LLM_Model, vocab: TokenVocabulary) -> None:
         super().__init__(model, vocab)
         self._spans_cache: tuple[str, list[str]] = ("", [])
 
@@ -83,9 +81,6 @@ class TextualGenerator(ValueGenerator):
 
     @staticmethod
     def _quoted(source: str) -> list[str]:
-        # Double quotes first: a request quoted with " may itself
-        # contain an apostrophe ("I'm"), which splitting on ' would
-        # cut in half.
         for delimiter in ('"', "'"):
             parts = source.split(delimiter)
             spans = [parts[i] for i in range(1, len(parts), 2) if parts[i]]
@@ -111,13 +106,15 @@ class TextualGenerator(ValueGenerator):
     def _is_looping(self, generated: list[int]) -> bool:
         """True when the last tokens already appeared in that order."""
         window = self.LOOP_WINDOW
-        if len(generated) < 2 * window:
+        cut = len(generated) - window
+        if cut < window:
             return False
-        tail = tuple(generated[-window:])
-        earlier = {
-            tuple(generated[i:i + window])
-            for i in range(len(generated) - window)
-        }
+
+        tail = tuple(generated[cut:])
+        earlier: set[tuple[int, ...]] = set()
+        for start in range(cut):
+            end = start + window
+            earlier.add(tuple(generated[start:end]))
         return tail in earlier
 
     def _is_stop_signal(self, generated: list[int], chosen_id: int) -> bool:

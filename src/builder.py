@@ -28,7 +28,6 @@ class ParametersBuilder:
             ParameterType.STRING: TextualGenerator(model, vocab),
             ParameterType.BOOLEAN: FlagGenerator(model, vocab),
         }
-        self.last_token_count = 0
 
     def build(
         self,
@@ -40,7 +39,6 @@ class ParametersBuilder:
         vocab = self._vocab
         written: list[int] = []
         values: dict[str, Any] = {}
-        self.last_token_count = 0
 
         pending = ""
         for index, (name, schema) in enumerate(function.parameters.items()):
@@ -55,6 +53,5 @@ class ParametersBuilder:
             written.extend(value_ids)
             values[name] = value
             pending = generator.SUFFIX
-            self.last_token_count += len(value_ids)
 
         return values

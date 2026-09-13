@@ -1,6 +1,5 @@
 import argparse
 import sys
-import time
 from pathlib import Path
 
 from llm_sdk import Small_LLM_Model
@@ -43,12 +42,10 @@ def parse_args() -> argparse.Namespace:
 def run(
     caller: FunctionCaller, prompts: list[TestPrompt]
 ) -> list[FunctionCallResult]:
-    """Process every request, reporting time and tokens as it goes."""
+    """Process every request, skipping the ones that fail."""
     results: list[FunctionCallResult] = []
-    total_start = time.perf_counter()
 
     for test_prompt in prompts:
-        start = time.perf_counter()
         try:
             result = caller.process(test_prompt)
         except KeyboardInterrupt:
@@ -57,19 +54,10 @@ def run(
         except (RuntimeError, ValueError) as exc:
             print(f"Skipped {test_prompt.prompt!r}: {exc}", file=sys.stderr)
             continue
-        elapsed = time.perf_counter() - start
 
-        print(
-            f"[{elapsed:5.1f}s] "
-            f"name={caller.last_name_tokens:2d} tok  "
-            f"values={caller.last_value_tokens:2d} tok  "
-            f"prompt={test_prompt.prompt!r}"
-        )
         if result is not None:
             results.append(result)
 
-    total = time.perf_counter() - total_start
-    print(f"\nTotal: {total:.1f}s for {len(prompts)} prompts")
     return results
 
 
@@ -107,7 +95,6 @@ def main() -> int:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
-    print(f"Processed {len(results)}/{len(prompts)} -> {args.output}")
     return 0
 
 
