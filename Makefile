@@ -1,21 +1,22 @@
 install:
 	uv sync
 
-run: ${MAIN}
+run:
 	uv run python -m src
 
 debug:
 	uv run python -m pdb -m src
 
 clean:
-	rm -rf __pycache__ .mypy_cache .pytest_cache
-	find . -type d name "__pycache__" -not -path "./venv/" -exec rm -rf {} +
+	rm -rf .mypy_cache .pytest_cache
+	find . -type d -name ".venv" -prune -o -type d -name "__pycache__" -exec rm -rf {} +
+
 lint:
-	uv run flake8 --exclude=.venv .
+	uv run flake8 --extend-exclude=.venv,llm_sdk .
 	uv run mypy . --warn-return-any --warn-unused-ignores --ignore-missing-imports --disallow-untyped-defs --check-untyped-defs
 
 lint-strict:
-	uv run flake8 .
+	uv run flake8 --extend-exclude=.venv,llm_sdk .
 	uv run mypy . --strict
 
-.PHONY: install run debug clean lint lint-strict test
+.PHONY: install run debug clean lint lint-strict
