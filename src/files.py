@@ -72,5 +72,5 @@ def write_results(path: Path, results: list[FunctionCallResult]) -> None:
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         raise OutputFileError(f"Could not write {path}: {exc}") from exc
