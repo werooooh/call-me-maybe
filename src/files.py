@@ -16,12 +16,13 @@ class OutputFileError(Exception):
 
 
 def _load_json_array(path: Path) -> list[dict[str, Any]]:
+    """Read a JSON array of objects, or raise InputFileError."""
     if not path.exists():
         raise InputFileError(f"File not found: {path}")
 
     try:
         content = path.read_text(encoding="utf-8")
-    except OSError as exc:
+    except (OSError, UnicodeDecodeError) as exc:
         raise InputFileError(f"Could not read {path}: {exc}") from exc
 
     try:
@@ -72,5 +73,5 @@ def write_results(path: Path, results: list[FunctionCallResult]) -> None:
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
-    except (OSError, UnicodeDecodeError) as exc:
+    except OSError as exc:
         raise OutputFileError(f"Could not write {path}: {exc}") from exc

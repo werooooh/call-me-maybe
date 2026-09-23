@@ -42,6 +42,7 @@ class PromptBuilder:
 
     @staticmethod
     def _list_functions(functions: list[FunctionDefinition]) -> str:
+        """One signature line per function, for the system prompt."""
         lines = []
         for fn in functions:
             params = ", ".join(

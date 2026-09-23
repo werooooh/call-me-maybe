@@ -31,6 +31,7 @@ class TextualGenerator(ValueGenerator):
         self._spans_cache: tuple[str, list[str]] = ("", [])
 
     def _allowed_next_ids(self, generated: list[int]) -> list[int]:
+        """Next token of the copied passage, or any safe token."""
         vocab = self._vocab
         content = self._model.decode(generated)
 
@@ -81,6 +82,7 @@ class TextualGenerator(ValueGenerator):
 
     @staticmethod
     def _quoted(source: str) -> list[str]:
+        """Passages between quotes, double ones taking priority."""
         for delimiter in ('"', "'"):
             parts = source.split(delimiter)
             spans = [parts[i] for i in range(1, len(parts), 2) if parts[i]]
@@ -90,6 +92,7 @@ class TextualGenerator(ValueGenerator):
 
     @staticmethod
     def _words(source: str) -> list[str]:
+        """Runs of letters and digits, used when nothing is quoted."""
         words: list[str] = []
         current = ""
         for char in source:
@@ -118,10 +121,13 @@ class TextualGenerator(ValueGenerator):
         return tail in earlier
 
     def _is_stop_signal(self, generated: list[int], chosen_id: int) -> bool:
+        """A token opening with a quote closes the value."""
         return chosen_id in self._vocab.closing_ids
 
     def _is_complete(self, generated: list[int]) -> bool:
+        """A string only ends on a stop signal, never on its own."""
         return False
 
     def _decode(self, generated: list[int]) -> str:
+        """The written tokens are the string content itself."""
         return self._model.decode(generated)

@@ -38,6 +38,7 @@ class TokenVocabulary:
 
     @staticmethod
     def _read_vocab(model: Small_LLM_Model) -> dict[str, int]:
+        """Load the token to id mapping from the model vocabulary."""
         try:
             path = model.get_path_to_vocab_file()
             with open(path, encoding="utf-8") as vocab_file:
@@ -47,6 +48,7 @@ class TokenVocabulary:
         return data
 
     def _require(self, text: str) -> int:
+        """Id of a token the decoder cannot work without."""
         try:
             return self._token_to_id[text]
         except KeyError as exc:

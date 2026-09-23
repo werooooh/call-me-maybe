@@ -14,9 +14,7 @@ class FunctionNameSelector:
     model.
     """
 
-    def __init__(
-        self, model: Small_LLM_Model, vocab: TokenVocabulary
-    ) -> None:
+    def __init__(self, model: Small_LLM_Model, vocab: TokenVocabulary) -> None:
         self._model = model
         self._vocab = vocab
 
@@ -51,6 +49,7 @@ class FunctionNameSelector:
         return (remaining[0][0] if remaining else ""), generated
 
     def _choose(self, input_ids: list[int], allowed_ids: list[int]) -> int:
+        """Best allowed token, asking the model only if needed."""
         if len(allowed_ids) == 1:
             return allowed_ids[0]
         logits = self._model.get_logits_from_input_ids(input_ids)

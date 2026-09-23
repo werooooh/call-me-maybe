@@ -19,6 +19,7 @@ class NumericGenerator(ValueGenerator):
     MAX_TOKENS = 12
 
     def _allowed_next_ids(self, generated: list[int]) -> list[int]:
+        """Digits, plus the sign, dot and end tokens where valid."""
         vocab = self._vocab
         if not generated:
             return vocab.digits + [vocab.minus]
@@ -31,14 +32,17 @@ class NumericGenerator(ValueGenerator):
         return allowed
 
     def _is_stop_signal(self, generated: list[int], chosen_id: int) -> bool:
+        """A separator means the model considers the number done."""
         return chosen_id in (self._vocab.comma, self._vocab.rbrace)
 
     def _is_complete(self, generated: list[int]) -> bool:
+        """Stop at the token cap, never on a sign or a dot."""
         if generated[-1] in (self._vocab.minus, self._vocab.dot):
             return False
         return len(generated) >= self.MAX_TOKENS
 
     def _decode(self, generated: list[int]) -> Any:
+        """Read the digits as a float when dotted, else an int."""
         text = self._model.decode(generated)
         try:
             return float(text) if "." in text else int(text)
