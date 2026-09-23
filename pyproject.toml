@@ -36,8 +36,6 @@ dev = [
 [tool.mypy]
 exclude = [
     "^\\.venv/",
-    "^data/",
-    "^test\\.py$",
 ]
 
 [[tool.mypy.overrides]]
