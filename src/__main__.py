@@ -51,7 +51,7 @@ def run(
         except KeyboardInterrupt:
             print("\nInterrupted.", file=sys.stderr)
             break
-        except (RuntimeError, ValueError) as exc:
+        except Exception as exc:
             print(f"Skipped {test_prompt.prompt!r}: {exc}", file=sys.stderr)
             continue
 

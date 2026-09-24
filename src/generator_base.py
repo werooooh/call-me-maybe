@@ -18,11 +18,9 @@ class ValueGenerator(ABC):
 
     PREFIX = ""
     SUFFIX = ""
-    MAX_STEPS = 256
+    MAX_STEPS = 1024
 
-    def __init__(
-        self, model: Small_LLM_Model, vocab: TokenVocabulary
-    ) -> None:
+    def __init__(self, model: Small_LLM_Model, vocab: TokenVocabulary) -> None:
         self._model = model
         self._vocab = vocab
         self._source_text = ""
